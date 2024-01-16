@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Contact List</title>
+    <link rel="stylesheet" type="text/css"  href="css/expiredmember.css">
+
+</head>
+
+ <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <h2>Gym Contact List</h2>
+<input type="text" id="searchInput" placeholder="Search...">
+
+    <table id="membersTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Expiry Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+
+<!-- not in use-->
+<!-- Add these buttons inside your HTML body -->
+<!-- <div id="paginationControls">
+    <button onclick="changePage(-1)">Previous</button>
+    <span id="pageInfo"></span>
+    <button onclick="changePage(1)">Next</button>
+</div>-->
+
+
+    <script>
+      let currentPage = 1;
+    let itemsPerPage = 1000000;
+    let membersDataGlobal = []; // Global array to store all members data
+
+function fetchMembersData(callback) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/fetchMembersData', true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            membersDataGlobal = JSON.parse(xhr.responseText);
+            allMembersData = [...membersDataGlobal]; // Copy data to allMembersData
+            if (callback) {
+                callback(); // Call the callback function once the data is fetched
+            }
+        }
+    };
+    xhr.send();
+}
+ function showLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function fetchMembersData(callback) {
+            showLoadingOverlay(); // Show loading overlay when fetching data
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/fetchMembersData', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    membersDataGlobal = JSON.parse(xhr.responseText);
+                    allMembersData = [...membersDataGlobal]; // Copy data to allMembersData
+                    hideLoadingOverlay(); // Hide loading overlay when data is fetched
+
+                    if (callback) {
+                        callback(); // Call the callback function once the data is fetched
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+
+// Modify the fetchMembersData call to pass the update functions as callbacks
+fetchMembersData(function () {
+    updateTable(membersDataGlobal);
+    //updatePaginationControls();
+});
+
+
+function updateTable(membersDataGlobal) {
+    const tableBody = document.getElementById('membersTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+
+    const currentDate = new Date();
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    membersDataGlobal.slice(startIndex, endIndex).forEach(member => {
+        const expiryDate = new Date(member.dateOfExpire);
+        const timeDifference = expiryDate.getTime() - currentDate.getTime();
+        const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+        if (daysDifference <= 3) {
+            const row = tableBody.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+
+            cell1.innerHTML = member.namee;
+            cell2.innerHTML = member.phone;
+            cell3.innerHTML = member.email;
+            cell4.innerHTML = member.dateOfExpire;
+
+            if (daysDifference <= 0) {
+                cell4.style.backgroundColor = '#f44336';
+                cell4.style.color = 'black';
+            } else if (daysDifference <= 3) {
+                //cell4.style.backgroundColor = 'white';
+                //cell4.style.color = 'black';
+            }
+        }
+    });
+}
+
+function changePage(amount) {
+    currentPage += amount;
+    if (currentPage < 1) currentPage = 1;
+
+    // Update the page info and table
+    updateTable(membersDataGlobal);
+    //updatePaginationControls();
+}
+
+function updatePaginationControls() {
+    const pageInfo = document.getElementById('pageInfo');
+    const totalPages = Math.ceil(membersDataGlobal.length / itemsPerPage);
+
+    if (currentPage > totalPages) currentPage = totalPages;
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+}
+
+
+        function viewContact(memberId,) {
+
+    
+        // Redirect to a new page and pass the data as query parameters
+        window.location.href = `/userview?id=${encodeURIComponent(memberId)}`;
+    }
+
+      
+    
+      function searchTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const table = document.getElementById('membersTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    const cellText = cells[j].innerHTML.toLowerCase();
+
+                    if (cellText.includes(input)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+
+document.getElementById('searchInput').addEventListener('input', searchTable);
+
+let sortDirection = {};
+
+function sortTable(column) {
+    const table = document.getElementById('membersTable');
+    const rows = Array.from(table.tBodies[0].rows).slice(0);
+
+    if (!sortDirection.hasOwnProperty(column)) {
+        sortDirection[column] = 0;
+    }
+
+    sortDirection[column] = 1 - sortDirection[column];
+
+    rows.sort((a, b) => {
+        const aValue = a.cells[column].textContent.trim().toLowerCase();
+        const bValue = b.cells[column].textContent.trim().toLowerCase();
+        return sortDirection[column] ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    });
+
+    table.tBodies[0].innerHTML = '';
+    rows.forEach(row => table.tBodies[0].appendChild(row));
+
+    updateSortingIndicator(column);
+}
+
+function updateSortingIndicator(column) {
+    const table = document.getElementById('membersTable');
+    const headerRow = table.rows[0];
+
+    headerRow.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
+    const sortingIndicator = headerRow.getElementsByTagName('th')[column];
+
+    if (sortDirection[column]) {
+        sortingIndicator.classList.add('asc');
+    } else {
+        sortingIndicator.classList.add('desc');
+    }
+}
+
+// Set initial sorting state and indicators
+sortDirection[0] = 1; // Assuming you want to initially sort the first column (Name) in ascending order
+updateSortingIndicator(0);
+
+document.querySelectorAll('#membersTable th').forEach((th, index) => {
+    th.addEventListener('click', () => sortTable(index));
+});
+
+
+
+
+    </script>
+
+</body>
+
+</html>

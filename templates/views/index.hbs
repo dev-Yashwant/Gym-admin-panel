@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Jim's Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css"  href="css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
+
+
+</head>
+
+<body>
+    <div class="dashboard">
+        <span><h1>Welcome, Jim!</h1></span> 
+        <div class="main-skills">
+            <a href="/register" class="card">
+                <h1> ADD USER</h1>
+                <i1 class="fas fa-user-plus"></i1>
+            </a>
+
+            <a href="/memberslists" class="card">
+                <h1>Manage Members</h1>
+                <i class="fas fa-users-cog"></i>
+                <div id="totalMembersLabel" class="count">0</div>
+            </a>
+
+
+
+            <a href="/logout" class="card">
+                <h1>Logout</h1>
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+
+            <a href="/expiredmembers" class="card">
+                <h1>Expired Members</h1>
+                <i class="fas fa-calendar-times"> </i>
+                <div id="expiredMembersLabel" class="count">0</div>
+            </a>
+
+            <div class="card">
+                <h1>Total Active Members</h1>
+                <i class="fas fa-user-check"></i>
+                <div id="activeMembersLabel" class="count">0</div>
+            </div>
+
+
+
+
+
+            <div class="stat">
+                <canvas id="membersChart" width="600" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Fetch data for total members, active members, and expired members
+        fetch("/fetchMembersData")
+            .then(response => response.json())
+            .then(data => {
+                const totalMembers = data.length;
+
+                // Update the total members count in the HTML
+                document.getElementById("totalMembersLabel").innerText = totalMembers;
+
+                // Fetch data for expired members
+                fetch("/fetchExpiredMembersData")
+                    .then(response => response.json())
+                    .then(expiredData => {
+                        const expiredMembers = expiredData.length;
+
+                        // Update the expired members count in the HTML
+                        document.getElementById("expiredMembersLabel").innerText = expiredMembers;
+
+                        // Calculate total active members
+                        const activeMembers = totalMembers - expiredMembers;
+
+                        // Update the active members count in the HTML
+                        document.getElementById("activeMembersLabel").innerText = activeMembers;
+                    })
+                    .catch(error => console.error("Error fetching expired members:", error));
+
+                // Fetch data for new members in the last 30 days
+                fetch("/fetchNewMembers30Data")
+                    .then(response => response.json())
+                    .then(newMembersData => {
+                        // Assuming newMembersData is an array of objects with date and count properties
+                        const newData = newMembersData.map(entry => entry.count);
+
+                        // Update the chart
+                        updateChart(newData);
+                    })
+                    .catch(error => console.error("Error fetching new members data:", error));
+            })
+            .catch(error => console.error("Error fetching total members:", error));
+
+        function updateChart(newData) {
+            // Get the canvas element
+            const ctx = document.getElementById("membersChart").getContext("2d");
+
+            // Create a new Chart instance
+            const membersChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: newData.length }, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'New Members (Last 30 Days)',
+                        data: newData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: { type: 'linear', position: 'bottom' },
+                        y: { min: 0 }
+                    }
+                }
+            });
+        }
+    </script>
+</body>

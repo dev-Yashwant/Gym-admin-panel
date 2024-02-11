@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Contact List</title>
+    <link rel="stylesheet" type="text/css"  href="css/memberlists.css">
+
+
+</head>
+
+<body>
+     <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
+
+    <h2>Gym Contact List</h2>
+    <input type="text" id="searchInput" placeholder="Search...">
+
+    <table id="membersTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Expiry Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+  
+
+    <script>
+      let currentPage = 1;
+    let itemsPerPage = 100000;
+    let membersDataGlobal = []; // Global array to store all members data
+
+    function fetchMembersData() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/fetchMembersData', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                membersDataGlobal = JSON.parse(xhr.responseText);
+                allMembersData = [...membersDataGlobal]; // Copy data to allMembersData
+                updateTable();
+                //updatePaginationControls();
+            }
+        };
+        xhr.send();
+    }
+
+
+
+        // Function to update the table with data
+      function updateTable() {
+    const tableBody = document.getElementById('membersTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = membersDataGlobal.slice(startIndex, endIndex);
+
+    paginatedData.forEach(member => {
+                const row = tableBody.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+                const cell4 = row.insertCell(3);
+                const cell5 = row.insertCell(4);
+
+                cell1.innerHTML = member.namee;
+                cell2.innerHTML = member.phone;
+                cell3.innerHTML = member.email;
+                cell4.innerHTML = member.dateOfExpire;
+                //console.log(member._id) // Assuming dateOfJoin is the expiry date, you may need to modify this based on your data
+                //cell5.innerHTML = `<button class="view-btn" onclick="viewContact('${member._id}')">View</button>`;
+                 cell5.innerHTML = `
+                    <button class="view-btn" onclick="viewContact('${member._id}')">View</button>
+                    <button class="delete-btn" onclick="deleteContact('${member._id}')">Delete</button>
+                `;
+                // Check if the expiry date has passed
+        const expiryDate = new Date(member.dateOfExpire);
+        const currentDate = new Date();
+
+        if (expiryDate < currentDate) {
+            // Set background color to red if the expiry date has passed
+            cell4.style.color = '#FE892E'; // You may adjust the text color for better visibility
+        }
+            });
+        }
+
+        function changePage(amount) {
+    currentPage += amount;
+    if (currentPage < 1) currentPage = 1;
+    const totalPages = Math.ceil(membersDataGlobal.length / itemsPerPage);
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    updateTable();
+    //updatePaginationControls();
+}
+
+function updatePaginationControls() {
+    const pageInfo = document.getElementById('pageInfo');
+    pageInfo.textContent = `Page ${currentPage}`;
+}
+       
+        function viewContact(memberId,) {
+
+    
+        // Redirect to a new page and pass the data as query parameters
+        window.location.href = `/userview?id=${encodeURIComponent(memberId)}`;
+    }
+  function deleteContact(memberId) {
+    // Show a confirmation dialog before proceeding with deletion
+    const isConfirmed = confirm("Are you sure you want to delete this user?");
+
+    if (isConfirmed) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('DELETE', `/deleteUserData?id=${encodeURIComponent(memberId)}`, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    // Reload the page or update the table after successful deletion
+                    fetchMembersData();
+                } else {
+                    console.error('Error deleting user data:', xhr.responseText);
+                }
+            }
+        };
+        xhr.send();
+    }
+}
+
+  let sortDirection = {};
+
+function sortTable(column) {
+    const table = document.getElementById('membersTable');
+    const rows = Array.from(table.tBodies[0].rows).slice(0);
+
+    if (!sortDirection.hasOwnProperty(column)) {
+        sortDirection[column] = 0;
+    }
+
+    sortDirection[column] = 1 - sortDirection[column];
+
+    rows.sort((a, b) => {
+        const aValue = a.cells[column].textContent.trim().toLowerCase();
+        const bValue = b.cells[column].textContent.trim().toLowerCase();
+        return sortDirection[column] ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    });
+
+    table.tBodies[0].innerHTML = '';
+    rows.forEach(row => table.tBodies[0].appendChild(row));
+
+    updateSortingIndicator(column);
+}
+
+function updateSortingIndicator(column) {
+    const table = document.getElementById('membersTable');
+    const headerRow = table.rows[0];
+
+    headerRow.querySelectorAll('th').forEach(th => th.classList.remove('asc', 'desc'));
+    const sortingIndicator = headerRow.getElementsByTagName('th')[column];
+
+    if (sortDirection[column]) {
+        sortingIndicator.classList.add('asc');
+        sortingIndicator.classList.remove('desc');
+    } else {
+        sortingIndicator.classList.add('desc');
+        sortingIndicator.classList.remove('asc');
+    }
+}
+
+document.querySelectorAll('#membersTable th').forEach((th, index) => {
+    th.addEventListener('click', () => sortTable(index));
+});
+
+
+
+function searchTable() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const table = document.getElementById('membersTable');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 0; i < membersDataGlobal.length; i++) {
+        let found = false;
+
+        for (let j = 0; j < rows[0].cells.length; j++) {
+            const cellText = String(membersDataGlobal[i][Object.keys(membersDataGlobal[i])[j]]).toLowerCase();
+
+            if (cellText.includes(input)) {
+                found = true;
+                break;
+            }
+        }
+
+        // Display or hide rows based on search results for the entire table
+        const rowIndex = i % itemsPerPage; // Calculate the row index within the current page
+        if (rows[rowIndex + 1]) {
+            rows[rowIndex + 1].style.display = found ? '' : 'none';
+        }
+    }
+
+    updatePaginationControls();
+}
+
+document.getElementById('searchInput').addEventListener('input', searchTable);
+   function showLoadingOverlay() {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    function hideLoadingOverlay() {
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    function fetchMembersData() {
+        showLoadingOverlay();
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/fetchMembersData', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                membersDataGlobal = JSON.parse(xhr.responseText);
+                allMembersData = [...membersDataGlobal];
+                updateTable();
+                hideLoadingOverlay(); // Hide loading overlay when data is loaded
+            }
+        };
+        xhr.send();
+    }
+
+    // Call fetchMembersData() at the end of your script to initiate the data fetching
+    fetchMembersData();
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>

@@ -13,8 +13,9 @@
         <div class="loader"></div>
     </div>
 
-    <h2>Gym Contact List</h2>
+<div class="alert"><h2>Gym Expired members!</h2>
 <input type="text" id="searchInput" placeholder="Search...">
+<button id="sendNotificationBtn" onclick="sendNotification()">Send Alert !</button></div>
 
     <table id="membersTable">
         <thead>
@@ -227,7 +228,31 @@ document.querySelectorAll('#membersTable th').forEach((th, index) => {
     th.addEventListener('click', () => sortTable(index));
 });
 
+    function sendNotification() {
 
+        document.getElementById('sendNotificationBtn').textContent = 'Sending..';
+
+        
+        
+        fetch('/sendemail', {
+            method: 'GET'
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Email alerts sent successfully.');
+                document.getElementById('sendNotificationBtn').textContent = 'Send Alert !';
+                alert('Email alerts sent successfully.');
+            } else {
+                console.error('Failed to send email alerts.');
+                document.getElementById('sendNotificationBtn').textContent = 'Send Alert !';
+                alert('Failed to send email alerts.');
+            }
+        })
+        .catch(error => {
+            console.error('Error sending email alerts:', error);
+        });
+        
+    }
 
 
     </script>

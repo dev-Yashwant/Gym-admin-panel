@@ -1,74 +1,92 @@
 body {
-font-family: Arial, sans-serif;
-margin: 20px;
-background-color:black;
-}
- table {
-     border-collapse: collapse;
-     width: 100%;
-     margin-top: 20px;
- }
-
-   th,
-td {
- border: 1px solid #dddddd;
- text-align: center;
- padding: 8px;
- color: white; /* Set text color to white */
-}
-
-th {
- color: white;
- background: #23242a;
-}
-th.asc::after {
-content: '\25b2'; /* Unicode for upward-pointing triangle */
-margin-left: 5px;
-}
-
-th.desc::after {
-content: '\25bc'; /* Unicode for downward-pointing triangle */
-margin-left: 5px;
-}
-
-
- button {
-     padding: 8px 12px;
-     cursor: pointer;
- }
-
- #searchInput{
-    height: 23px;
-    width: 15%;
-    color: #fff;
-    border-radius: 4px;
-    border:0.1px solid white;
-    background-color: #23242a;
-    caret-color: transparent;
-}
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    display: none; /* Initially hide the loading overlay */
-}
-
-.loader {
-    width: 50px;
-    height: 50px;
-    background-color: #f0f3f5;
-    border-radius: 50%;
-    animation: pulsate 1.5s ease-in-out infinite;
-}
-
-@keyframes pulsate {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color:black;
+    }
+    h2{
+        color: #fff;
+    }
+    .alert button{
+        color: wheat;
+        background-color: rgb(220, 73, 73);
+        margin-left: 76%;
+        border-radius: 5px;
+        border: 0.5px solid black;
+    }
+    .alert button:hover{
+        color: wheat;
+        background-color: rgb(207, 36, 36);
+        margin-left: 76%;
+        border-radius: 5px;
+        border: 0.5px solid black;
+    }
+    
+     table {
+         border-collapse: collapse;
+         width: 100%;
+         margin-top: 20px;
+     }
+    
+       th,
+    td {
+     border: 1px solid #dddddd;
+     text-align: center;
+     padding: 8px;
+     color: white; /* Set text color to white */
+    }
+    
+    th {
+     color: white;
+     background: #23242a;
+    }
+    th.asc::after {
+    content: '\25b2'; /* Unicode for upward-pointing triangle */
+    margin-left: 5px;
+    }
+    
+    th.desc::after {
+    content: '\25bc'; /* Unicode for downward-pointing triangle */
+    margin-left: 5px;
+    }
+    
+    
+     button {
+         padding: 8px 12px;
+         cursor: pointer;
+     }
+    
+     #searchInput{
+        height: 23px;
+        width: 15%;
+        color: #fff;
+        border-radius: 4px;
+        border:0.1px solid white;
+        background-color: #23242a;
+        caret-color: transparent;
+    }
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        display: none; /* Initially hide the loading overlay */
+    }
+    
+    .loader {
+        width: 50px;
+        height: 50px;
+        background-color: #f0f3f5;
+        border-radius: 50%;
+        animation: pulsate 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulsate {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }

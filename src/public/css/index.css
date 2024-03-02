@@ -1,0 +1,120 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-decoration: none;
+    font-family: poppins, sans-serif;
+}
+
+body {
+    background-image: url(../image/girlback.jpg);
+    background-size: cover;
+    background-color: black;
+}
+
+.main {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+span h1{
+    color: #fff;
+    margin-left: 1rem;
+}
+
+.main-skills {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-left: 1rem;
+    margin-top: 5px;
+}
+
+.main-skills .card {
+    background-color: inherit;
+    border: 1px solid #fff;
+    color: #fff;
+    width: 28%;
+    height: 8rem;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    box-shadow: 5px 8px 13px rgba(174, 165, 165, 0.4);
+}
+
+.card:active {
+    transform: scale(1.09);
+}
+
+.main-skills .card h3 {
+    margin: 10px;
+    text-transform: capitalize;
+}
+
+.graph {
+    display: flex;
+    background-color: inherit;
+    border: 1px solid #fff;
+    color: #fff;
+    height: 14rem;
+    width: 80rem;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-left: 1.5rem;
+    margin-top: 15px;
+    margin-right: 1rem;
+    cursor: pointer;
+    box-shadow: 5px 8px 13px rgba(174, 165, 165, 0.4);
+}
+
+.one {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: 1rem;
+    margin-left: 1rem;
+    margin-top: 5px;
+}
+
+/* ... (your existing CSS code) ... */
+
+.main-skills .card {
+    background-color: inherit;
+    border: 1px solid #fff;
+    color: #fff;
+    width: 28%;
+    height: 8rem;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    box-shadow: 5px 8px 13px rgba(174, 165, 165, 0.4);
+    display: flex;
+    /* Added to make it a flex container */
+    justify-content: space-between;
+    /* Added to separate text and icon */
+    align-items: center;
+    /* Added to vertically center content */
+}
+
+.main-skills .card i {
+    font-size: 4rem;
+    margin-left: 60px;
+    /* Adjust this value as needed */
+    /* Adjust this value as needed */
+}
+
+.main-skills .card h1 {
+    margin-bottom: 10px;
+    /* Adjust this value as needed */
+    text-transform: capitalize;
+    width: 40%;
+}
+.main-skills .card i1 {
+    font-size: 4rem;
+    margin-right: 35px;
+    /* Adjust this value as needed */
+    /* Adjust this value as needed */
+}

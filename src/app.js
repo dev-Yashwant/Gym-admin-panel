@@ -8,28 +8,18 @@ const hbs = require("hbs");
 const bodyParser = require("body-parser"); 
 const session = require('express-session');
 const User = require("./models/login");
-const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const auth = require("./middleware/auth")
+const nodemailer = require('nodemailer');
 
 
-
-
-const DB = 'mongodb+srv://amanpal58465:aman@cluster0.uxiouvx.mongodb.net/gym?retryWrites=true&w=majority';
-
-mongoose.connect(DB,{
-    useNewUrlParser:true,
-}).then(()=>{
-   console.log('connection succesfullll')
-}).catch((error)=>console.log('no connection',error))
-
-//require("./db/conn");
+require("./db/conn");
 const Register = require("./models/registers");
 const { request } = require("http");
 
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 //PATH
 const static_path = path.join(__dirname, "../public");
@@ -75,6 +65,8 @@ app.get("/login",auth ,(req, res) => {
 
 app.get("/logout", auth ,(req, res) => {
     try {
+
+        console.log("i am here")
         req.user.tokens = req.user.tokens.filter((currElement) =>{
             return currElement.token  != req.token
         })
@@ -114,15 +106,65 @@ app.get("/expiredmembers" ,auth,(req,res) => {
 });
 
 
+app.get("/sendemail", auth, async (req, res) => {
+    try {
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.gmail,
+                pass: process.env.password
+            }
+        });
+
+        // Get the current date
+        const currentDate = new Date().toISOString();
+
+        // Find members whose expiration date is less than the current date
+        const expiredMembers = await Register.find({ dateOfExpire: { $lt: currentDate } }).lean().exec();
+
+        // Iterate over expired members and send email to each member
+        for (const member of expiredMembers) {
+            // Define email options for each member
+            let mailOptions = {
+                from: 'gympanel@gmail.com',
+                to: member.email, // Get the email from member data
+                subject: 'Membership Expiry Notification',
+                text: `Subject: Your Fitness journey Gym Membership\n\n` +
+                `Dear ${member.namee},\n\n` +
+                `We hope this email finds you well!\n\n` +
+                `We wanted to inform you that your membership with Fitness journey has recently expired. We want to take this opportunity to thank you for being a valued member of our community.\n\n` +
+                `As a part of our commitment to your fitness journey, we invite you to renew your membership and continue enjoying access to our state-of-the-art facilities, expert trainers, and exciting classes.\n\n` +
+                `Renewing your membership is quick and easy! Simply visit our website or drop by our front desk to speak with one of our friendly staff members.\n\n` +
+                `We understand that life can get busy, but we're here to support you every step of the way. Don't let your fitness goals take a back seat – take action today and renew your membership to stay on track towards a healthier, happier you!\n\n` +
+                `If you have any questions or need assistance with your renewal, feel free to reach out to our customer support team. We're here to help!\n\n` +
+                `Thank you for choosing Fitness journey as your fitness partner. We look forward to continuing this journey together and helping you achieve your fitness goals!\n\n` +
+                `Best Regards,\nThe Fitness journey Team`
+                };
+
+            // Send email
+            await transporter.sendMail(mailOptions);
+            console.log(`Email sent successfully to ${member.email}`);
+        }
+
+        res.status(200).json({ message: "Emails sent successfully to expired members" });
+    } catch (error) {
+        console.error("Error occurred while sending emails:", error);
+        res.status(500).json({ error: "Failed to send emails" });
+    }
+});
+
 
 
 app.post("/login",async (req,res) => {
     try{
         const username = req.body.username;
         const password = req.body.password; 
-        console.log(req.body.username)
+        console.log(req.body)
+        
         const user_data = await User.findOne({username:username})   
+        console.log(user_data)
         const ismatch = await bcrypt.compare(password,user_data.password)
+        
         
         const token = await user_data.generateAuthToken();
         //change date to increse and decrease the days session 
@@ -181,7 +223,6 @@ app.post("/register", async (req, res) => {
         });
 
         const registered = await registerEmployee.save();
-        console.log("yash");
         res.send('<script>alert("Data successfully registered"); window.location="/index";</script>');
     } catch (error) {
         // Check if the error is a duplicate key error (E11000)

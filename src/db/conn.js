@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 <<<<<<< HEAD
-const DB = 'mongodb+srv://amanpal58465:aman@cluster0.uxiouvx.mongodb.net/gym?retryWrites=true&w=majority';
+const DB = '';
 
 mongoose.connect(DB,{
     useNewUrlParser:true,

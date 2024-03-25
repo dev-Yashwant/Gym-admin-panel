@@ -22,7 +22,10 @@
     "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
+<<<<<<< HEAD
     "nodemailer": "^6.9.11",
+=======
+>>>>>>> dfcbc1f0cdc79f7351f7e9fbf97d08f6caeb11cc
     "nodemon": "^3.0.1",
     "package.json": "^2.0.1",
     "passport": "^0.6.0",

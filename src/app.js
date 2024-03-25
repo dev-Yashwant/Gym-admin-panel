@@ -8,18 +8,41 @@ const hbs = require("hbs");
 const bodyParser = require("body-parser"); 
 const session = require('express-session');
 const User = require("./models/login");
+<<<<<<< HEAD
 const cookieParser = require("cookie-parser");
 const auth = require("./middleware/auth")
 const nodemailer = require('nodemailer');
 
 
 require("./db/conn");
+=======
+const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
+const auth = require("./middleware/auth")
+
+
+
+
+const DB = '';
+
+mongoose.connect(DB,{
+    useNewUrlParser:true,
+}).then(()=>{
+   console.log('connection succesfullll')
+}).catch((error)=>console.log('no connection',error))
+
+//require("./db/conn");
+>>>>>>> dfcbc1f0cdc79f7351f7e9fbf97d08f6caeb11cc
 const Register = require("./models/registers");
 const { request } = require("http");
 
 
 
+<<<<<<< HEAD
 const port = process.env.PORT || 4000;
+=======
+const port = process.env.PORT || 3000;
+>>>>>>> dfcbc1f0cdc79f7351f7e9fbf97d08f6caeb11cc
 
 //PATH
 const static_path = path.join(__dirname, "../public");
@@ -65,8 +88,11 @@ app.get("/login",auth ,(req, res) => {
 
 app.get("/logout", auth ,(req, res) => {
     try {
+<<<<<<< HEAD
 
         console.log("i am here")
+=======
+>>>>>>> dfcbc1f0cdc79f7351f7e9fbf97d08f6caeb11cc
         req.user.tokens = req.user.tokens.filter((currElement) =>{
             return currElement.token  != req.token
         })
@@ -106,6 +132,7 @@ app.get("/expiredmembers" ,auth,(req,res) => {
 });
 
 
+<<<<<<< HEAD
 app.get("/sendemail", auth, async (req, res) => {
     try {
         let transporter = nodemailer.createTransport({
@@ -153,12 +180,15 @@ app.get("/sendemail", auth, async (req, res) => {
     }
 });
 
+=======
+>>>>>>> dfcbc1f0cdc79f7351f7e9fbf97d08f6caeb11cc
 
 
 app.post("/login",async (req,res) => {
     try{
         const username = req.body.username;
         const password = req.body.password; 
+<<<<<<< HEAD
         console.log(req.body)
         
         const user_data = await User.findOne({username:username})   
@@ -166,6 +196,12 @@ app.post("/login",async (req,res) => {
         const ismatch = await bcrypt.compare(password,user_data.password)
         
         
+=======
+        console.log(req.body.username)
+        const user_data = await User.findOne({username:username})   
+        const ismatch = await bcrypt.compare(password,user_data.password)
+        
+>>>>>>> dfcbc1f0cdc79f7351f7e9fbf97d08f6caeb11cc
         const token = await user_data.generateAuthToken();
         //change date to increse and decrease the days session 
         const days = 30;
@@ -223,6 +259,10 @@ app.post("/register", async (req, res) => {
         });
 
         const registered = await registerEmployee.save();
+<<<<<<< HEAD
+=======
+        console.log("yash");
+>>>>>>> dfcbc1f0cdc79f7351f7e9fbf97d08f6caeb11cc
         res.send('<script>alert("Data successfully registered"); window.location="/index";</script>');
     } catch (error) {
         // Check if the error is a duplicate key error (E11000)
